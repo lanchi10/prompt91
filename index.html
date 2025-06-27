@@ -1,0 +1,743 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>המנטור האישי ליצירת פרומפטים</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Rubik:wght@300;400;500;600;700&display=swap');
+        
+        body {
+            font-family: 'Rubik', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: white;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .glass-card {
+            background: rgba(255,255,255,0.1);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 24px;
+            padding: 40px;
+            margin-bottom: 30px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .logo {
+            font-size: 4rem;
+            margin-bottom: 20px;
+            animation: pulse 2s infinite;
+        }
+
+        .title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 15px;
+        }
+
+        .subtitle {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            line-height: 1.6;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 4px;
+            margin-bottom: 30px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #4ecdc4, #f093fb);
+            width: 25%;
+            transition: width 0.6s ease;
+            border-radius: 4px;
+        }
+
+        .step-card {
+            display: none;
+        }
+
+        .step-card.active {
+            display: block;
+            animation: fadeIn 0.6s ease;
+        }
+
+        .step-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .step-icon {
+            font-size: 3.5rem;
+            margin-bottom: 20px;
+        }
+
+        .step-title {
+            font-size: 2rem;
+            font-weight: 600;
+            margin-bottom: 15px;
+        }
+
+        .step-description {
+            font-size: 1.1rem;
+            opacity: 0.9;
+            line-height: 1.6;
+        }
+
+        .text-input {
+            width: 100%;
+            padding: 20px;
+            border: 2px solid rgba(255,255,255,0.2);
+            border-radius: 16px;
+            background: rgba(0,0,0,0.2);
+            color: white;
+            font-size: 1.1rem;
+            font-family: inherit;
+            transition: all 0.3s ease;
+            resize: vertical;
+            min-height: 120px;
+            margin-bottom: 30px;
+        }
+
+        .text-input:focus {
+            outline: none;
+            border-color: #4ecdc4;
+            background: rgba(0,0,0,0.3);
+            box-shadow: 0 0 20px rgba(78, 205, 196, 0.3);
+        }
+
+        .text-input::placeholder {
+            color: rgba(255,255,255,0.6);
+        }
+
+        .options-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .option-card {
+            padding: 25px;
+            border: 2px solid rgba(255,255,255,0.2);
+            border-radius: 16px;
+            background: rgba(255,255,255,0.1);
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .option-card:hover {
+            transform: translateY(-5px);
+            border-color: #4ecdc4;
+            box-shadow: 0 10px 30px rgba(78, 205, 196, 0.2);
+        }
+
+        .option-card.selected {
+            border-color: #4ecdc4;
+            background: rgba(78, 205, 196, 0.2);
+            box-shadow: 0 0 20px rgba(78, 205, 196, 0.3);
+        }
+
+        .option-icon {
+            font-size: 2.5rem;
+            margin-bottom: 15px;
+        }
+
+        .option-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .option-description {
+            font-size: 0.9rem;
+            opacity: 0.8;
+            line-height: 1.4;
+        }
+
+        .btn {
+            padding: 15px 30px;
+            border: none;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            font-family: inherit;
+            margin: 0 10px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #4ecdc4, #667eea);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(78, 205, 196, 0.4);
+        }
+
+        .btn-secondary {
+            background: rgba(255,255,255,0.1);
+            color: white;
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255,255,255,0.2);
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .platform-card {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            padding: 20px;
+            border: 2px solid rgba(255,255,255,0.2);
+            border-radius: 16px;
+            background: rgba(255,255,255,0.1);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-bottom: 15px;
+        }
+
+        .platform-card:hover {
+            border-color: #4ecdc4;
+            transform: translateX(10px);
+        }
+
+        .platform-card.selected {
+            border-color: #4ecdc4;
+            background: rgba(78, 205, 196, 0.2);
+        }
+
+        .platform-card.recommended {
+            border-color: #ffd93d;
+            box-shadow: 0 0 20px rgba(255, 217, 61, 0.3);
+        }
+
+        .platform-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            background: #4ecdc4;
+        }
+
+        .prompt-display {
+            background: rgba(0,0,0,0.4);
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 16px;
+            padding: 25px;
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        .prompt-text {
+            white-space: pre-wrap;
+            line-height: 1.6;
+            font-size: 1rem;
+        }
+
+        .copy-btn {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            background: #4ecdc4;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+
+        .copy-btn:hover {
+            background: #45b7b8;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @media (max-width: 768px) {
+            .container { padding: 15px; }
+            .glass-card { padding: 25px; }
+            .title { font-size: 2rem; }
+            .options-grid { grid-template-columns: 1fr; }
+            .platform-card { flex-direction: column; text-align: center; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <div class="logo">🧠✨</div>
+            <h1 class="title">המנטור האישי ליצירת פרומפטים</h1>
+            <p class="subtitle">הדרך הפשוטה והחכמה ביותר להפוך רעיון לתוצאה מושלמת</p>
+        </header>
+
+        <div class="progress-bar">
+            <div class="progress-fill" id="progressFill"></div>
+        </div>
+
+        <!-- Step 1: Welcome -->
+        <div class="step-card glass-card active" id="step1">
+            <div class="step-header">
+                <div class="step-icon">👋</div>
+                <h2 class="step-title">שלום! אני המנטור האישי שלך</h2>
+                <p class="step-description">
+                    אני כאן כדי לעזור לך ליצור הוראות מושלמות לכלי בינה מלאכותית.
+                    זה פשוט כמו לשוחח עם חבר מומחה שיודע בדיוק איך לעזור לך.
+                </p>
+            </div>
+            
+            <div style="text-align: center; margin-bottom: 30px;">
+                <div style="background: rgba(255,217,61,0.2); padding: 20px; border-radius: 16px; margin: 0 auto; max-width: 500px;">
+                    <h3 style="color: #ffd93d; margin-bottom: 15px;">💡 למה זה חשוב?</h3>
+                    <p>
+                        כשאתה יודע איך לתקשר נכון עם AI, אתה יכול לחסוך שעות של עבודה
+                        ולקבל תוצאות מדויקות יותר. אין צורך בידע טכני!
+                    </p>
+                </div>
+            </div>
+
+            <div class="button-group">
+                <button class="btn btn-primary" onclick="nextStep()">
+                    <i class="fas fa-arrow-left"></i>
+                    בואו נתחיל!
+                </button>
+            </div>
+        </div>
+
+        <!-- Step 2: Goal Definition -->
+        <div class="step-card glass-card" id="step2">
+            <div class="step-header">
+                <div class="step-icon">🎯</div>
+                <h2 class="step-title">מה אתה רוצה להשיג היום?</h2>
+                <p class="step-description">
+                    ספר לי במילים שלך מה המטרה שלך. אל תדאג לנסח זאת בצורה מושלמת.
+                </p>
+            </div>
+
+            <textarea 
+                id="goalInput" 
+                class="text-input" 
+                placeholder="לדוגמה:
+• אני רוצה לכתוב מייל מקצועי למנהל שלי על העלאה במשכורת
+• אני צריך עזרה לתכנן טיול משפחתי לאירופה
+• אני רוצה ללמוד איך לבשל פסטה איטלקית
+• אני צריך לכתוב פוסט לאינסטגרם על המוצר שלי"
+            ></textarea>
+
+            <div class="button-group">
+                <button class="btn btn-secondary" onclick="prevStep()">
+                    <i class="fas fa-arrow-right"></i> חזור
+                </button>
+                <button class="btn btn-primary" id="goalNextBtn" onclick="nextStep()" disabled>
+                    <i class="fas fa-arrow-left"></i> המשך
+                </button>
+            </div>
+        </div>
+
+        <!-- Step 3: Style Selection -->
+        <div class="step-card glass-card" id="step3">
+            <div class="step-header">
+                <div class="step-icon">🎨</div>
+                <h2 class="step-title">איך תרצה לקבל את התשובה?</h2>
+                <p class="step-description">
+                    בחר את הסגנון שהכי מתאים לך (אפשר לדלג על השלב הזה).
+                </p>
+            </div>
+
+            <div class="options-grid">
+                <div class="option-card" data-value="professional">
+                    <div class="option-icon">👔</div>
+                    <div class="option-title">מקצועי ורשמי</div>
+                    <div class="option-description">לעבודה, מיילים חשובים</div>
+                </div>
+                <div class="option-card" data-value="friendly">
+                    <div class="option-icon">😊</div>
+                    <div class="option-title">חברותי ונגיש</div>
+                    <div class="option-description">לחברים, משפחה, יומיום</div>
+                </div>
+                <div class="option-card" data-value="simple">
+                    <div class="option-icon">🧒</div>
+                    <div class="option-title">פשוט וברור</div>
+                    <div class="option-description">הסברים פשוטים להבנה</div>
+                </div>
+            </div>
+
+            <div class="button-group">
+                <button class="btn btn-secondary" onclick="prevStep()">
+                    <i class="fas fa-arrow-right"></i> חזור
+                </button>
+                <button class="btn btn-primary" onclick="nextStep()">
+                    <i class="fas fa-arrow-left"></i> בחר כלי AI
+                </button>
+            </div>
+        </div>
+
+        <!-- Step 4: Platform Selection -->
+        <div class="step-card glass-card" id="step4">
+            <div class="step-header">
+                <div class="step-icon">🤖</div>
+                <h2 class="step-title">איזה כלי AI הכי מתאים לך?</h2>
+                <p class="step-description">
+                    אני אמליץ לך על הכלי הטוב ביותר בהתבסס על המטרה שלך.
+                </p>
+            </div>
+
+            <div id="recommendationBanner" style="background: rgba(255,217,61,0.2); padding: 20px; border-radius: 16px; text-align: center; margin-bottom: 25px; border: 2px solid #ffd93d;">
+                <h3 style="color: #ffd93d; margin-bottom: 10px;">
+                    <i class="fas fa-star"></i> ההמלצה שלי עבורך
+                </h3>
+                <p id="recommendationText" style="margin-bottom: 15px;"></p>
+                <button class="btn btn-primary" onclick="selectRecommended()">
+                    <i class="fas fa-check"></i> בחר בהמלצה
+                </button>
+            </div>
+
+            <div id="platformsList"></div>
+
+            <div class="button-group">
+                <button class="btn btn-secondary" onclick="prevStep()">
+                    <i class="fas fa-arrow-right"></i> חזור
+                </button>
+                <button class="btn btn-primary" id="platformNextBtn" onclick="nextStep()" disabled>
+                    <i class="fas fa-magic"></i> צור פרומפט!
+                </button>
+            </div>
+        </div>
+
+        <!-- Step 5: Result -->
+        <div class="step-card glass-card" id="step5">
+            <div class="step-header">
+                <div class="step-icon">🎉</div>
+                <h2 class="step-title">הפרומפט המושלם שלך מוכן!</h2>
+                <p class="step-description">
+                    פשוט העתק והדבק את ההוראה ב-<span id="selectedPlatformName"></span>
+                </p>
+            </div>
+
+            <div class="prompt-display">
+                <button class="copy-btn" onclick="copyPrompt()">
+                    <i class="fas fa-copy"></i> העתק
+                </button>
+                <div class="prompt-text" id="finalPrompt"></div>
+            </div>
+
+            <div style="text-align: center; margin-bottom: 30px;">
+                <a id="openPlatformLink" href="#" target="_blank" class="btn btn-primary" style="text-decoration: none;">
+                    <i class="fas fa-external-link-alt"></i>
+                    פתח את <span id="platformLinkName"></span>
+                </a>
+            </div>
+
+            <div class="button-group">
+                <button class="btn btn-secondary" onclick="startOver()">
+                    <i class="fas fa-redo"></i> צור פרומפט חדש
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Global variables
+        let currentStep = 1;
+        let userGoal = '';
+        let selectedStyle = '';
+        let selectedPlatform = null;
+
+        // Platform data
+        const platforms = {
+            chatgpt: {
+                name: 'ChatGPT',
+                url: 'https://chat.openai.com',
+                icon: '🤖',
+                description: 'הכי פופולרי ומומלץ למתחילים. מעולה לכתיבה ויצירתיות.',
+                keywords: ['כתוב', 'מייל', 'יצירתי', 'רעיון', 'סיפור', 'פוסט']
+            },
+            claude: {
+                name: 'Claude',
+                url: 'https://claude.ai',
+                icon: '🧠',
+                description: 'מעולה לניתוח טקסטים וכתיבה מקצועית.',
+                keywords: ['ניתוח', 'מסמך', 'מקצועי', 'מחקר', 'סיכום']
+            },
+            gemini: {
+                name: 'Gemini',
+                url: 'https://gemini.google.com',
+                icon: '⭐',
+                description: 'חזק במידע עדכני וחיפוש.',
+                keywords: ['מידע', 'חיפוש', 'עדכני', 'גוגל']
+            },
+            perplexity: {
+                name: 'Perplexity',
+                url: 'https://perplexity.ai',
+                icon: '🔍',
+                description: 'מומחה למחקר ומקורות מהימנים.',
+                keywords: ['מחקר', 'מקורות', 'עובדות', 'שאלות']
+            }
+        };
+
+        // Navigation functions
+        function nextStep() {
+            if (currentStep === 2 && !validateGoal()) {
+                return;
+            }
+            
+            if (currentStep === 2) {
+                userGoal = document.getElementById('goalInput').value.trim();
+            }
+            
+            if (currentStep === 3) {
+                generateRecommendation();
+                populatePlatforms();
+            }
+            
+            if (currentStep === 4) {
+                if (!selectedPlatform) return;
+                generatePrompt();
+            }
+            
+            if (currentStep < 5) {
+                document.getElementById(`step${currentStep}`).classList.remove('active');
+                currentStep++;
+                document.getElementById(`step${currentStep}`).classList.add('active');
+                updateProgress();
+            }
+        }
+
+        function prevStep() {
+            if (currentStep > 1) {
+                document.getElementById(`step${currentStep}`).classList.remove('active');
+                currentStep--;
+                document.getElementById(`step${currentStep}`).classList.add('active');
+                updateProgress();
+            }
+        }
+
+        function updateProgress() {
+            const progress = (currentStep / 5) * 100;
+            document.getElementById('progressFill').style.width = `${progress}%`;
+        }
+
+        // Validation
+        function validateGoal() {
+            const goal = document.getElementById('goalInput').value.trim();
+            const nextBtn = document.getElementById('goalNextBtn');
+            
+            if (goal.length > 10) {
+                nextBtn.disabled = false;
+                nextBtn.style.opacity = '1';
+                return true;
+            } else {
+                nextBtn.disabled = true;
+                nextBtn.style.opacity = '0.5';
+                return false;
+            }
+        }
+
+        // Platform recommendation
+        function generateRecommendation() {
+            const goal = userGoal.toLowerCase();
+            let recommended = 'chatgpt'; // default
+            
+            for (const [key, platform] of Object.entries(platforms)) {
+                if (platform.keywords.some(keyword => goal.includes(keyword))) {
+                    recommended = key;
+                    break;
+                }
+            }
+            
+            selectedPlatform = recommended;
+            document.getElementById('recommendationText').textContent = 
+                `בהתבסס על הבקשה שלך, ${platforms[recommended].name} תהיה הבחירה הטובה ביותר.`;
+        }
+
+        function populatePlatforms() {
+            const container = document.getElementById('platformsList');
+            container.innerHTML = '';
+            
+            for (const [key, platform] of Object.entries(platforms)) {
+                const card = document.createElement('div');
+                card.className = 'platform-card';
+                if (key === selectedPlatform) {
+                    card.classList.add('recommended', 'selected');
+                }
+                
+                card.innerHTML = `
+                    <div class="platform-icon">${platform.icon}</div>
+                    <div class="platform-info">
+                        <h3>${platform.name}</h3>
+                        <p>${platform.description}</p>
+                    </div>
+                `;
+                
+                card.onclick = () => selectPlatform(key);
+                container.appendChild(card);
+            }
+            
+            document.getElementById('platformNextBtn').disabled = false;
+            document.getElementById('platformNextBtn').style.opacity = '1';
+        }
+
+        function selectRecommended() {
+            // Mark the recommended platform as selected
+            if (selectedPlatform) {
+                // Find and mark the recommended platform card as selected
+                const platformCards = document.querySelectorAll('.platform-card');
+                platformCards.forEach(card => card.classList.remove('selected'));
+                
+                // Find the card for the recommended platform and select it
+                const recommendedIndex = Object.keys(platforms).indexOf(selectedPlatform);
+                if (platformCards[recommendedIndex]) {
+                    platformCards[recommendedIndex].classList.add('selected');
+                }
+                
+                // Enable the next button
+                document.getElementById('platformNextBtn').disabled = false;
+                document.getElementById('platformNextBtn').style.opacity = '1';
+                
+                // Move to next step
+                nextStep();
+            }
+        }
+
+        function selectPlatform(key) {
+            selectedPlatform = key;
+            document.querySelectorAll('.platform-card').forEach(card => {
+                card.classList.remove('selected');
+            });
+            event.currentTarget.classList.add('selected');
+            
+            document.getElementById('platformNextBtn').disabled = false;
+            document.getElementById('platformNextBtn').style.opacity = '1';
+        }
+
+        // Style selection
+        document.addEventListener('DOMContentLoaded', function() {
+            document.querySelectorAll('#step3 .option-card').forEach(card => {
+                card.addEventListener('click', function() {
+                    document.querySelectorAll('#step3 .option-card').forEach(c => c.classList.remove('selected'));
+                    this.classList.add('selected');
+                    selectedStyle = this.dataset.value;
+                });
+            });
+        });
+
+        // Prompt generation
+        function generatePrompt() {
+            const platform = platforms[selectedPlatform];
+            
+            let prompt = `אני צריך עזרה עם המשימה הבאה: "${userGoal}"
+
+אנא:
+1. הבן את המטרה שלי בדיוק
+2. ספק לי תשובה מקיפה ומעשית`;
+
+            if (selectedStyle) {
+                const styleMap = {
+                    'professional': 'מקצועי ורשמי',
+                    'friendly': 'חברותי ונגיש',
+                    'simple': 'פשוט וברור'
+                };
+                prompt += `\n3. השתמש בסגנון ${styleMap[selectedStyle]}`;
+            }
+
+            prompt += `\n${selectedStyle ? '4' : '3'}. כתב בעברית ברורה ומדויקת
+${selectedStyle ? '5' : '4'}. אם משהו לא ברור - שאל אותי שאלות הבהרה
+
+תודה!`;
+            
+            document.getElementById('finalPrompt').textContent = prompt;
+            document.getElementById('selectedPlatformName').textContent = platform.name;
+            document.getElementById('platformLinkName').textContent = platform.name;
+            document.getElementById('openPlatformLink').href = platform.url;
+        }
+
+        // Utility functions
+        function copyPrompt() {
+            const promptText = document.getElementById('finalPrompt').textContent;
+            navigator.clipboard.writeText(promptText).then(() => {
+                const btn = document.querySelector('.copy-btn');
+                const originalText = btn.innerHTML;
+                btn.innerHTML = '<i class="fas fa-check"></i> הועתק!';
+                btn.style.background = '#45b7b8';
+                setTimeout(() => {
+                    btn.innerHTML = originalText;
+                    btn.style.background = '#4ecdc4';
+                }, 2000);
+            }).catch(() => {
+                alert('הפרומפט הועתק לזיכרון!');
+            });
+        }
+
+        function startOver() {
+            currentStep = 1;
+            userGoal = '';
+            selectedStyle = '';
+            selectedPlatform = null;
+            
+            document.getElementById('goalInput').value = '';
+            document.getElementById('goalNextBtn').disabled = true;
+            document.getElementById('goalNextBtn').style.opacity = '0.5';
+            
+            document.querySelectorAll('.option-card').forEach(card => card.classList.remove('selected'));
+            document.querySelectorAll('.step-card').forEach(card => card.classList.remove('active'));
+            document.getElementById('step1').classList.add('active');
+            updateProgress();
+        }
+
+        // Event listeners
+        document.getElementById('goalInput').addEventListener('input', validateGoal);
+
+        // Initialize
+        updateProgress();
+    </script>
+</body>
+</html>
